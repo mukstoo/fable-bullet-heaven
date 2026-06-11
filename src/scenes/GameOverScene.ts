@@ -54,11 +54,12 @@ export class GameOverScene extends Phaser.Scene {
       ['SURVIVED', `${mm}:${ss}`],
       ['LEVEL', String(r.level)],
       ['KILLS', String(r.kills)],
-      ['GOLD', String(r.gold)],
+      ['GOLD LOOTED', `+${r.gold}`],
       ['', ''],
       ['BEST TIME', `${bmm}:${bss}`],
       ['BEST KILLS', String(save.bestKills)],
-      ['VICTORIES', String(save.wins)]
+      ['VICTORIES', String(save.wins)],
+      ['GOLD BANK', String(save.gold)]
     ];
     rows.forEach(([k, v], i) => {
       if (!k) return;
@@ -72,7 +73,7 @@ export class GameOverScene extends Phaser.Scene {
     });
 
     const hint = this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT - 60, '[ENTER] fight again      [T] title', {
+      .text(GAME_WIDTH / 2, GAME_HEIGHT - 60, '[ENTER] fight again    [S] crypt shop    [T] title', {
         fontFamily: FONT,
         fontSize: '11px',
         color: '#9be8ff'
@@ -84,6 +85,7 @@ export class GameOverScene extends Phaser.Scene {
     kb.on('keydown-ENTER', () => this.again());
     kb.on('keydown-SPACE', () => this.again());
     kb.on('keydown-R', () => this.again());
+    kb.on('keydown-S', () => this.toShop());
     kb.on('keydown-T', () => this.toTitle());
     kb.on('keydown-ESC', () => this.toTitle());
     this.input.on('pointerdown', () => this.again());
@@ -97,5 +99,10 @@ export class GameOverScene extends Phaser.Scene {
   private toTitle() {
     Sfx.play('uiclick', 0.3);
     this.scene.start('Title');
+  }
+
+  private toShop() {
+    Sfx.play('chest', 0.5);
+    this.scene.start('Shop');
   }
 }

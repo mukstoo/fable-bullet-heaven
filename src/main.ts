@@ -7,6 +7,7 @@ import { HudScene } from './scenes/HudScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
 import { PauseScene } from './scenes/PauseScene';
 import { GameOverScene } from './scenes/GameOverScene';
+import { ShopScene } from './scenes/ShopScene';
 
 /** load the pixel font before boot so text renders correctly from frame one */
 async function loadFont() {
@@ -41,7 +42,7 @@ async function start() {
         debug: false
       }
     },
-    scene: [BootScene, TitleScene, GameScene, HudScene, LevelUpScene, PauseScene, GameOverScene]
+    scene: [BootScene, TitleScene, GameScene, HudScene, LevelUpScene, PauseScene, GameOverScene, ShopScene]
   });
 
   // debug/testing handle (used by automated playtests; harmless in production)

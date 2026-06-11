@@ -107,6 +107,28 @@ export class TitleScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const save = loadSave();
+
+    // Crypt Shop entry — top-left, shows the banked gold
+    const shopBtn = this.add
+      .text(10, 10, `[S] CRYPT SHOP  ·  ${save.gold} gold`, {
+        fontFamily: FONT,
+        fontSize: '10px',
+        color: '#ffd34e',
+        stroke: '#000000',
+        strokeThickness: 3
+      })
+      .setOrigin(0)
+      .setInteractive({ useHandCursor: true });
+    shopBtn.on('pointerover', () => shopBtn.setColor('#ffffff'));
+    shopBtn.on('pointerout', () => shopBtn.setColor('#ffd34e'));
+    shopBtn.on(
+      'pointerdown',
+      (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
+        event.stopPropagation(); // keep the global "click to fight" handler out of it
+        this.openShop();
+      }
+    );
+
     if (save.runs > 0) {
       const mm = String(Math.floor(save.bestTimeSec / 60)).padStart(2, '0');
       const ss = String(save.bestTimeSec % 60).padStart(2, '0');
@@ -133,6 +155,7 @@ export class TitleScene extends Phaser.Scene {
     const kb = this.input.keyboard!;
     kb.on('keydown-ENTER', () => this.startGame());
     kb.on('keydown-SPACE', () => this.startGame());
+    kb.on('keydown-S', () => this.openShop());
     kb.on('keydown-M', () => Sfx.toggleMute());
     this.input.on('pointerdown', () => this.startGame());
   }
@@ -144,6 +167,16 @@ export class TitleScene extends Phaser.Scene {
     this.cameras.main.fadeOut(350, 6, 6, 14);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
       this.scene.start('Game');
+    });
+  }
+
+  private openShop() {
+    if (this.starting) return;
+    this.starting = true;
+    Sfx.play('chest', 0.5);
+    this.cameras.main.fadeOut(250, 6, 6, 14);
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+      this.scene.start('Shop');
     });
   }
 }

@@ -81,7 +81,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
 
     // --- player + camera ---
     this.player = new Player(this, 0, 0);
-    this.run = new RunState('spark');
+    this.run = new RunState('spark', loadSave().meta);
     this.player.stats = this.run.stats;
     this.player.hp = this.run.stats.maxHp;
     this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
@@ -312,7 +312,27 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
     const dealt = this.player.hurt(final, this.runTime);
     if (dealt <= 0) return;
     this.juice.shake(0.005, 150);
-    if (this.player.hp <= 0) this.endRun(false);
+    if (this.player.hp <= 0) {
+      if (this.run.revivesLeft > 0) this.gravewalkerRevive();
+      else this.endRun(false);
+    }
+  }
+
+  /** Gravewalker's Pact: once per run, rise at half HP with a repelling shockwave */
+  private gravewalkerRevive() {
+    this.run.revivesLeft -= 1;
+    this.player.hp = Math.max(1, Math.round(this.run.stats.maxHp * 0.5));
+    this.player.iframesUntil = this.runTime + 2000;
+    this.juice.announce('THE GRAVE REJECTS YOU', '#6ee86e');
+    this.juice.ringPulse(this.player.x, this.player.y, 240, 0x6ee86e, 600);
+    this.juice.shake(0.008, 400);
+    Sfx.play('levelup', 0.7);
+    for (const e of this.activeEnemies) {
+      const dx = e.x - this.player.x;
+      const dy = e.y - this.player.y;
+      if (dx * dx + dy * dy > 260 * 260) continue;
+      this.damageEnemy(e, 30, dx, dy, 420);
+    }
   }
 
   /** EnemyContext — cultists, witch and reaper shoot through this */
@@ -375,7 +395,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
       this.player.heal(40);
       this.juice.floatText(this.player.x, this.player.y - 24, '+40', COLORS.HEAL);
     } else if (c.kind === 'gold') {
-      this.run.gold += 30;
+      this.run.addGold(30);
       this.juice.floatText(this.player.x, this.player.y - 24, '+30 gold', '#ffd34e');
     } else {
       this.run.applyChoice(c);
@@ -387,7 +407,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
   openChest() {
     Sfx.play('chest', 0.6);
     this.juice.ringPulse(this.player.x, this.player.y, 140, 0xffd34e, 500);
-    this.run.gold += DROPS.CHEST_GOLD;
+    this.run.addGold(DROPS.CHEST_GOLD);
     this.player.heal(DROPS.CHEST_HEAL);
     const up = this.run.randomDirectUpgrade(this.rng);
     if (up) {
@@ -429,13 +449,14 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
       timeSurvivedSec: Math.floor(this.runTime / 1000),
       level: this.run.level,
       kills: this.run.kills,
-      gold: this.run.gold
+      gold: Math.floor(this.run.gold)
     };
     const save = loadSave();
     save.runs += 1;
     if (victory) save.wins += 1;
     save.bestTimeSec = Math.max(save.bestTimeSec, result.timeSurvivedSec);
     save.bestKills = Math.max(save.bestKills, result.kills);
+    save.gold += result.gold; // banked — spend it in the Crypt Shop
     storeSave(save);
 
     this.time.delayedCall(1400, () => {

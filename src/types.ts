@@ -18,6 +18,16 @@ export type PassiveId =
   | 'bloodpact'
   | 'echo';
 
+export type MetaUpgradeId =
+  | 'might'
+  | 'vigor'
+  | 'alacrity'
+  | 'fleet'
+  | 'reach'
+  | 'greed'
+  | 'stoneskin'
+  | 'gravewalker';
+
 export type EnemyTypeId =
   | 'imp'
   | 'skeleton'
@@ -65,6 +75,23 @@ export interface PassiveDef {
   apply: (stats: PlayerStats) => void;
 }
 
+/** Permanent upgrade bought with banked gold in the Crypt Shop. */
+export interface MetaUpgradeDef {
+  id: MetaUpgradeId;
+  name: string;
+  /** per-level effect, e.g. "+4% damage" */
+  desc: string;
+  icon: string;
+  maxLevel: number;
+  /** gold cost to buy each level; length = maxLevel */
+  costs: number[];
+  /** applies one owned level onto run stats (same contract as passives) */
+  apply: (stats: PlayerStats) => void;
+}
+
+/** Owned meta upgrade levels, persisted in the save. */
+export type MetaLevels = Partial<Record<MetaUpgradeId, number>>;
+
 export interface EnemyDef {
   id: EnemyTypeId;
   name: string;
@@ -99,6 +126,9 @@ export interface PlayerStats {
   areaMult: number;
   projSpeedMult: number;
   amountBonus: number; // flat extra projectiles
+  goldMult: number;
+  /** revives granted at run start (Gravewalker's Pact) */
+  revives: number;
 }
 
 /** One entry of the spawn timeline. Active from tStart (inclusive) until the next entry. */
@@ -146,4 +176,7 @@ export interface SaveData {
   wins: number;
   runs: number;
   muted: boolean;
+  /** banked gold, spendable in the Crypt Shop */
+  gold: number;
+  meta: MetaLevels;
 }

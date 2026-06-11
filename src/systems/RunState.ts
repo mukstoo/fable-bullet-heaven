@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { BUILD_LIMITS, PLAYER, XP } from '../config';
 import { WEAPONS, WEAPON_MAX_LEVEL, weaponUpgradeBlurb } from '../data/weapons';
 import { PASSIVES } from '../data/passives';
-import type { PassiveId, PlayerStats, UpgradeChoice, WeaponId } from '../types';
+import { applyMetaToStats } from '../data/meta';
+import type { MetaLevels, PassiveId, PlayerStats, UpgradeChoice, WeaponId } from '../types';
 
 /** Everything a single run accumulates: build, xp, kills, gold, derived stats. */
 export class RunState {
@@ -16,21 +17,34 @@ export class RunState {
     cooldownMult: 1,
     areaMult: 1,
     projSpeedMult: 1,
-    amountBonus: 0
+    amountBonus: 0,
+    goldMult: 1,
+    revives: 0
   };
 
   readonly weapons = new Map<WeaponId, number>();
   readonly passives = new Map<PassiveId, number>();
+  /** permanent Crypt Shop levels, baked into every recompute */
+  private readonly meta: MetaLevels;
 
   level = 1;
   xp = 0;
   xpNeeded = XP.needed(1);
   kills = 0;
+  /** fractional internally (gold multiplier); display/bank with Math.floor */
   gold = 0;
+  revivesLeft = 0;
 
-  constructor(startingWeapon: WeaponId = 'spark') {
+  constructor(startingWeapon: WeaponId = 'spark', meta: MetaLevels = {}) {
+    this.meta = meta;
     this.weapons.set(startingWeapon, 1);
     this.recompute();
+    this.revivesLeft = this.stats.revives;
+  }
+
+  /** gold income sink — applies the meta gold multiplier */
+  addGold(value: number) {
+    this.gold += value * this.stats.goldMult;
   }
 
   /** add xp; returns how many level-ups it produced */
@@ -58,6 +72,9 @@ export class RunState {
     s.areaMult = 1;
     s.projSpeedMult = 1;
     s.amountBonus = 0;
+    s.goldMult = 1;
+    s.revives = 0;
+    applyMetaToStats(s, this.meta);
     for (const [id, lvl] of this.passives) {
       const def = PASSIVES[id];
       for (let i = 0; i < lvl; i++) def.apply(s);

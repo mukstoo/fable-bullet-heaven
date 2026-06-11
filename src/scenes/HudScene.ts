@@ -80,7 +80,7 @@ export class HudScene extends Phaser.Scene {
     this.timerText.setText(`${mm}:${ss}`);
 
     this.killsText.setText(`KILLS ${run.kills}`);
-    this.goldText.setText(`GOLD ${run.gold}`);
+    this.goldText.setText(`GOLD ${Math.floor(run.gold)}`);
     this.muteText.setText(Sfx.muted ? 'MUTED [M]' : '[M]UTE  [P]AUSE');
 
     this.refreshBuildIcons(gs);

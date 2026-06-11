@@ -161,7 +161,7 @@ export class Loot {
         Sfx.play('magnet', 0.55);
         break;
       case 'coin':
-        run.gold += DROPS.GOLD_VALUE;
+        run.addGold(DROPS.GOLD_VALUE);
         juice.floatText(player.x, player.y - 24, `+${DROPS.GOLD_VALUE} gold`, '#ffd34e');
         Sfx.play('coin', 0.45);
         break;
