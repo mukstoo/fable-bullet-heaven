@@ -1,9 +1,9 @@
 # Needs you
 
 - 🟡 **[simple] Push `main` to deploy the update** (2026-06-11 evening session: Crypt Shop
-  + weapon evolutions). Local `main` is already fast-forwarded to `fe589fa` and the work is
-  backed up on `origin/feat/game`; the permission classifier blocked me from pushing the
-  production branch. To ship:
+  + weapon evolutions + Tomb Mimic). Local `main` is already fast-forwarded to `b7e0bd1` and
+  the work is backed up on `origin/feat/game`; the permission classifier blocked me from
+  pushing the production branch. To ship:
   ```
   git push origin main
   ```
