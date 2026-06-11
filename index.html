@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="description" content="GRAVEHORDE — a dark-fantasy bullet-heaven. Survive the horde, slay the Reaper." />
+    <title>GRAVEHORDE</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0a0a12;
+        height: 100%;
+        overflow: hidden;
+      }
+      #game {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #game canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+      .boot-msg {
+        color: #6cc644;
+        font-family: monospace;
+        font-size: 14px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game"><span class="boot-msg">summoning the horde…</span></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
