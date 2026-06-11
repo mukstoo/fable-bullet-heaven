@@ -4,3 +4,6 @@ dist/
 *.local
 .vite/
 tmp/
+.playwright-mcp/
+*.png
+!public/**/*.png
