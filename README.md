@@ -10,7 +10,13 @@ bosses, and put Death itself back in the ground.
 
 Built **one-shot** by Claude (Fable 5) with Phaser 3 + TypeScript + Vite.
 
-![gameplay](docs/screenshots/gameplay.png)
+![gameplay — minute 5, Grave Colossus incoming](docs/screenshots/gameplay.png)
+
+<details>
+<summary>title screen</summary>
+
+![title screen](docs/screenshots/title.png)
+</details>
 
 ## How to play
 
