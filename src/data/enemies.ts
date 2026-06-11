@@ -35,6 +35,10 @@ export const ENEMIES: Record<EnemyTypeId, EnemyDef> = {
     id: 'brute', name: 'Tomb Crawler', texture: 'tiles', hp: 130, speed: 34, damage: 22, xp: 8,
     radius: 13, scale: 3.0, knockbackResist: 0.7
   },
+  mimic: {
+    id: 'mimic', name: 'Tomb Mimic', texture: 'tiles', hp: 55, speed: 100, damage: 0, xp: 0,
+    radius: 9, scale: 2.4, knockbackResist: 0.4, fleeing: true
+  },
   boss_colossus: {
     id: 'boss_colossus', name: 'GRAVE COLOSSUS', texture: 'tiles', hp: 2100, speed: 42, damage: 26,
     xp: 60, radius: 26, scale: 5.2, knockbackResist: 0.95, tint: 0xb8c4cc, boss: true
@@ -59,6 +63,7 @@ export const ENEMY_FRAME: Record<EnemyTypeId, number> = {
   ghost: F.GHOST,
   cultist: F.ACOLYTE,
   brute: F.CRAB,
+  mimic: F.MIMIC,
   boss_colossus: F.GOLEM,
   boss_witch: F.WIZARD,
   boss_reaper: F.GHOST

@@ -102,6 +102,15 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     if (d.boss) {
       ({ vx, vy } = this.bossBrain(runTime, dist, nx, ny, ctx));
+    } else if (d.fleeing) {
+      // mimic: bolt away from the player with panicky course changes
+      if (runTime >= this.nextDriftAt) {
+        const away = Math.atan2(-ny, -nx) + Phaser.Math.FloatBetween(-0.7, 0.7);
+        this.driftDir.set(Math.cos(away), Math.sin(away));
+        this.nextDriftAt = runTime + Phaser.Math.Between(500, 1000);
+      }
+      vx = this.driftDir.x * d.speed;
+      vy = this.driftDir.y * d.speed;
     } else if (d.drifter) {
       // wraiths glide in straight lines re-aimed at the player every few seconds
       if (runTime >= this.nextDriftAt) {

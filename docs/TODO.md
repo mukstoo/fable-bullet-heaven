@@ -24,13 +24,13 @@
       (`src/data/meta.ts`), once-per-run Gravewalker revive, Title/GameOver entries
 - [x] Weapon evolutions: maxed weapon + matching passive + boss chest → level-6 evolved
       form (all 6 weapons), eligibility hint, HUD `E` marker, evolved visuals
+- [x] Treasure goblin: Tomb Mimic at 2:30 / 7:00 / 9:30 — flees with panicky wobble,
+      harmless, bursts into 12–18 coins if caught, escapes after 10s (or past the leash)
 
 ## Next session candidates
 
 - [ ] 2nd/3rd playable character (different starting weapon + stat spread)
 - [ ] Touch controls (virtual joystick) for mobile
-- [ ] More scripted events: treasure goblin (Tomb Mimic frame 92 is *right there* —
-      flees the player, rains gold when killed; synergizes with the shop economy)
 - [ ] Settings: volume sliders (currently mute toggle only)
 - [ ] Damage-type variety: DoT/burn, slow, crits
 - [ ] Shop balance pass once a human has played a few runs (cost curve is a guess:

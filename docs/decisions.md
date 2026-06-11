@@ -29,6 +29,15 @@
 - Shop UI is keyboard-first (grid nav + ENTER) with full mouse support; Title's global
   "click to fight" is kept off the shop button via Phaser's `event.stopPropagation()` in the
   object handler (object handlers fire before the scene-level `POINTER_DOWN`).
+- **Tomb Mimic = a `fleeing` flag on EnemyDef**, not a new entity class: flee-with-wobble
+  brain branch in `Enemy.updateEnemy`, contact early-return (it deals no damage — `hurtPlayer`
+  floors at 1, so skipping beats `damage: 0`), coin-shower instead of gems in `Loot.dropFor`,
+  and two escape paths (10s lifetime in the GameScene loop; crossing the 1100px leash
+  despawns it instead of recycling). Knobs in `config.MIMIC`; spawns t=150/420/570.
+- **Playwright-testing pause-sensitive behavior:** level-up modals pause the Game scene and
+  silently freeze any in-flight measurement (`setTimeout` keeps running, runTime doesn't).
+  For movement assertions set `run.xpNeeded = 1e9` + long player i-frames first, and sample
+  `runTime` inside the evaluate to prove the clock advanced.
 
 ## 2026-06-11 — initial one-shot build (Claude Fable 5)
 

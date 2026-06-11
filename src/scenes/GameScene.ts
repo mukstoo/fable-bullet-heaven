@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, DEPTH, DROPS, GAME_HEIGHT, GAME_WIDTH, PLAYER, POOL_SIZES } from '../config';
+import { COLORS, DEPTH, DROPS, GAME_HEIGHT, GAME_WIDTH, MIMIC, PLAYER, POOL_SIZES } from '../config';
 import { F } from '../data/frames';
 import { Enemy } from '../entities/Enemy';
 import { Player } from '../entities/Player';
@@ -208,6 +208,11 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
         arr.pop();
         continue;
       }
+      if (e.def.fleeing && rt - e.spawnedAt > MIMIC.LIFETIME_MS) {
+        this.juice.floatText(e.x, e.y - 16, 'it slips away…', COLORS.TEXT_DIM);
+        e.disableBody(true, true);
+        continue;
+      }
       e.updateEnemy(rt, delta, this.player, this);
     }
 
@@ -284,7 +289,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
 
   private killEnemy(enemy: Enemy) {
     this.run.kills += 1;
-    this.juice.deathPoof(enemy.x, enemy.y, enemy.isElite ? 0xffd34e : 0x9a6aff);
+    this.juice.deathPoof(enemy.x, enemy.y, enemy.isElite || enemy.def.fleeing ? 0xffd34e : 0x9a6aff);
     Sfx.play('die', 0.3, Phaser.Math.Between(-100, 200));
     this.loot.dropFor(enemy);
     const wasBoss = enemy.def.boss;
@@ -300,6 +305,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
 
   private onEnemyContact(enemy: Enemy) {
     if (!enemy.active || this.runEnded) return;
+    if (enemy.def.fleeing) return; // mimics are harmless — loot, not threat
     if (this.runTime < enemy.nextContactAt) return;
     enemy.nextContactAt = this.runTime + PLAYER.CONTACT_TICK_MS;
     this.hurtPlayer(enemy.contactDamage);

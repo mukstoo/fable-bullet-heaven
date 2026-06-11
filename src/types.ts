@@ -36,6 +36,7 @@ export type EnemyTypeId =
   | 'ghost'
   | 'cultist'
   | 'brute'
+  | 'mimic'
   | 'boss_colossus'
   | 'boss_witch'
   | 'boss_reaper';
@@ -122,6 +123,8 @@ export interface EnemyDef {
   ranged?: { intervalMs: number; range: number; keepDistance: number; projSpeed: number; projDamage: number };
   /** ghosts drift through in straight lines and fade */
   drifter?: boolean;
+  /** runs away from the player, deals no contact damage, escapes if not killed */
+  fleeing?: boolean;
   boss?: boolean;
 }
 
@@ -151,7 +154,7 @@ export interface WavePhase {
   pool: { type: EnemyTypeId; weight: number }[];
 }
 
-export type TimedEventKind = 'ring' | 'elite' | 'boss' | 'swarm';
+export type TimedEventKind = 'ring' | 'elite' | 'boss' | 'swarm' | 'mimic';
 
 export interface TimedEvent {
   /** seconds into the run */

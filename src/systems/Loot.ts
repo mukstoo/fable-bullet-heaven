@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DEPTH, DROPS, POOL_SIZES, XP } from '../config';
+import { DEPTH, DROPS, MIMIC, POOL_SIZES, XP } from '../config';
 import { F } from '../data/frames';
 import { Sfx } from './audio';
 import type { Enemy } from '../entities/Enemy';
@@ -47,6 +47,14 @@ export class Loot {
 
   /** drop the gem (and maybe a bonus pickup) for a killed enemy */
   dropFor(enemy: Enemy) {
+    if (enemy.def.fleeing) {
+      // mimic: no xp — it bursts into a shower of coins
+      const n = Phaser.Math.Between(MIMIC.GOLD_COINS_MIN, MIMIC.GOLD_COINS_MAX);
+      for (let i = 0; i < n; i++) {
+        this.spawnPickup(enemy.x + Phaser.Math.Between(-44, 44), enemy.y + Phaser.Math.Between(-44, 44), 'coin');
+      }
+      return;
+    }
     this.spawnGem(enemy.x, enemy.y, enemy.xpValue);
     if (enemy.isElite) {
       this.spawnPickup(enemy.x + 20, enemy.y, Math.random() < 0.5 ? 'heal' : 'magnet');

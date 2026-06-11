@@ -9,8 +9,7 @@ _Last update: 2026-06-11 evening session (Claude Fable 5): Crypt Shop + weapon e
    bot-balanced guesses. Knobs: `src/config.ts`, `src/data/meta.ts`, `src/data/weapons.ts`.
 2. Feature shortlist (ranked): **2nd playable character** (sprites in tilemap frames
    84–112; needs a character-select + per-character starting weapon/stat spread) →
-   **treasure goblin event** (Tomb Mimic frame 92; gold synergy with the shop) →
-   volume sliders → touch controls.
+   volume sliders → touch controls → damage-type variety.
 3. `docs/setup-review.md` has tooling proposals for Rodrigo's global CC setup — only
    implement what he approves.
 
@@ -39,6 +38,9 @@ localStorage save. All CC0/OFL assets credited in CREDITS.md.
   takes priority over the random chest upgrade. Pairings: spark+power, arc+haste,
   axes+vitality, orbitals+swiftness, nova+shield, storm+echo. One-time "thirsts — slay a
   boss!" hint when eligible; HUD marks evolved icons with gold border + `E`.
+- **Tomb Mimic treasure event** (t=150/420/570): harmless chest-creature spawns at the
+  screen edge and flees; kill it inside 10s for a 12–18 coin shower, or it slips away.
+  `fleeing` flag on EnemyDef + `config.MIMIC` knobs.
 - Both features Playwright-verified end-to-end (buy → persist → stats apply → revive →
   death → bank → re-enter shop; evolve → no double-evolve → evolved visuals/stats).
 

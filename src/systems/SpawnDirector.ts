@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DIFFICULTY, RUN } from '../config';
+import { DIFFICULTY, MIMIC, RUN } from '../config';
 import { ENEMIES } from '../data/enemies';
 import { WAVE_PHASES, freshEvents } from '../data/waves';
 import { Sfx } from './audio';
@@ -71,6 +71,10 @@ export class SpawnDirector {
         const dx = e.x - player.x;
         const dy = e.y - player.y;
         if (dx * dx + dy * dy > leashSq) {
+          if (e.def.fleeing) {
+            e.disableBody(true, true); // the mimic got away
+            continue;
+          }
           const p = this.ringPosition();
           e.setPosition(p.x, p.y);
         }
@@ -105,6 +109,16 @@ export class SpawnDirector {
         const p = this.ringPosition();
         const e = this.spawn(ev.type ?? 'zombie', p.x, p.y, runTime, true);
         if (e) this.gs.juice.announce(`ELITE ${e.def.name.toUpperCase()}`, '#ffd34e');
+        break;
+      }
+      case 'mimic': {
+        const { player, juice } = this.gs;
+        const a = Math.random() * Math.PI * 2;
+        const e = this.spawn('mimic', player.x + Math.cos(a) * MIMIC.SPAWN_DIST, player.y + Math.sin(a) * MIMIC.SPAWN_DIST, runTime);
+        if (e) {
+          juice.announce('A TOMB MIMIC FLEES!', '#ffd34e');
+          Sfx.play('coin', 0.7, -200);
+        }
         break;
       }
       case 'boss': {

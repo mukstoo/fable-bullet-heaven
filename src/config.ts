@@ -67,6 +67,16 @@ export const DROPS = {
   CHEST_HEAL: 20
 };
 
+/** Tomb Mimic treasure event: kill it before it escapes for a gold shower */
+export const MIMIC = {
+  /** ms before it slips away */
+  LIFETIME_MS: 10000,
+  /** spawns this far from the player (screen edge — it must be SEEN fleeing) */
+  SPAWN_DIST: 400,
+  GOLD_COINS_MIN: 12,
+  GOLD_COINS_MAX: 18
+};
+
 /** Max simultaneously-held weapons / passives */
 export const BUILD_LIMITS = {
   WEAPONS: 4,
