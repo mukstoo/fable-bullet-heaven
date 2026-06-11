@@ -1,6 +1,18 @@
 # HANDOFF — GRAVEHORDE
 
-_Last update: 2026-06-11 (one-shot build session, Claude Fable 5)_
+_Last update: 2026-06-11, end of one-shot build session (Claude Fable 5)_
+
+## Next session starts here
+
+1. **Rodrigo owes playtest feedback** — the game has never been played by a human.
+   Expect a balance v4 from his impressions (all knobs: `src/config.ts`, `src/data/*`).
+2. Feature shortlist ranked by fun-per-effort in my final analysis: **meta-progression
+   gold shop** (gold already counted+saved, just unspendable) → **weapon evolutions**
+   (maxed weapon + matching passive → evolved form via boss chest) → **2–3 more playable
+   characters** (sprites already in the tilemap, frames 84–112) → more mid-run events.
+3. `docs/setup-review.md` has tooling/skill improvement proposals for Rodrigo's global
+   CC setup — implement only what he approves.
+4. Build cost reference: ~1h22m wall clock, ~775k output tokens (~$153 API-equivalent).
 
 ## State: SHIPPED ✅
 
