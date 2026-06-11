@@ -18,13 +18,21 @@
 - [x] GH Pages deploy workflow + live URL
 - [x] Pause-key fix (event-driven one-shot inputs)
 
+## Done (2026-06-11 evening session)
+
+- [x] Meta progression: Crypt Shop — gold banks to the save, 8 permanent upgrades
+      (`src/data/meta.ts`), once-per-run Gravewalker revive, Title/GameOver entries
+- [x] Weapon evolutions: maxed weapon + matching passive + boss chest → level-6 evolved
+      form (all 6 weapons), eligibility hint, HUD `E` marker, evolved visuals
+
 ## Next session candidates
 
-- [ ] Meta progression: spend gold between runs (permanent upgrades shop)
 - [ ] 2nd/3rd playable character (different starting weapon + stat spread)
-- [ ] Weapon evolutions (maxed weapon + matching passive → upgraded form)
 - [ ] Touch controls (virtual joystick) for mobile
-- [ ] More scripted events: treasure goblin (Tomb Mimic frame 92 is *right there*)
+- [ ] More scripted events: treasure goblin (Tomb Mimic frame 92 is *right there* —
+      flees the player, rains gold when killed; synergizes with the shop economy)
 - [ ] Settings: volume sliders (currently mute toggle only)
 - [ ] Damage-type variety: DoT/burn, slow, crits
+- [ ] Shop balance pass once a human has played a few runs (cost curve is a guess:
+      ~1550 gold total, earn rate ~50–120/run)
 - [ ] itch.io publishing alongside Pages

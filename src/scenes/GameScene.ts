@@ -11,8 +11,9 @@ import { RunState } from '../systems/RunState';
 import { SpawnDirector } from '../systems/SpawnDirector';
 import { Sfx } from '../systems/audio';
 import { loadSave, storeSave } from '../systems/save';
+import { EVOLVED_LEVEL, WEAPONS, WEAPON_MAX_LEVEL } from '../data/weapons';
 import type { EnemyContext } from '../entities/Enemy';
-import type { RunResult, UpgradeChoice } from '../types';
+import type { RunResult, UpgradeChoice, WeaponId } from '../types';
 
 const DECOR_FRAMES = [F.GRAVE_CROSS, F.GRAVESTONE, F.SLAB_A, F.SLAB_B, F.HOLE, F.BONES];
 
@@ -48,6 +49,8 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
   private pendingLevelUps = 0;
   private choosingUpgrade = false;
   private regenCarry = 0;
+  /** weapons already nudged with the "can evolve" hint this run */
+  private evoHinted = new Set<WeaponId>();
 
   constructor() {
     super('Game');
@@ -62,6 +65,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
     this.currentBoss = null;
     this.reaperSpawned = false;
     this.activeEnemies = [];
+    this.evoHinted.clear();
     this.rng = new Phaser.Math.RandomDataGenerator([String(Date.now())]);
 
     // --- world dressing ---
@@ -401,7 +405,41 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
       this.run.applyChoice(c);
       if (c.kind === 'passive' && c.id === 'vitality') this.player.heal(25);
       this.player.hp = Math.min(this.player.hp, this.run.stats.maxHp);
+      this.maybeHintEvolution();
     }
+  }
+
+  /** one-time nudge when a weapon becomes evolution-eligible */
+  private maybeHintEvolution() {
+    for (const [id, lvl] of this.run.weapons) {
+      if (lvl !== WEAPON_MAX_LEVEL || this.evoHinted.has(id)) continue;
+      const evo = WEAPONS[id].evolution;
+      if (!evo || !this.run.passives.has(evo.requires)) continue;
+      this.evoHinted.add(id);
+      this.juice.floatText(
+        this.player.x,
+        this.player.y - 44,
+        `${WEAPONS[id].name} thirsts — slay a boss!`,
+        '#ff9a3c'
+      );
+    }
+  }
+
+  /** evolve the first eligible weapon: maxed + matching passive owned */
+  private tryEvolveWeapon(): boolean {
+    for (const [id, lvl] of this.run.weapons) {
+      if (lvl !== WEAPON_MAX_LEVEL) continue;
+      const evo = WEAPONS[id].evolution;
+      if (!evo || !this.run.passives.has(evo.requires)) continue;
+      this.run.weapons.set(id, EVOLVED_LEVEL);
+      this.juice.announce(evo.name.toUpperCase(), '#ff9a3c');
+      this.juice.ringPulse(this.player.x, this.player.y, 230, 0xff9a3c, 700);
+      this.juice.floatText(this.player.x, this.player.y - 40, 'WEAPON EVOLVED', '#ff9a3c');
+      this.juice.shake(0.006, 350);
+      Sfx.play('levelup', 0.8, -200);
+      return true;
+    }
+    return false;
   }
 
   openChest() {
@@ -409,6 +447,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
     this.juice.ringPulse(this.player.x, this.player.y, 140, 0xffd34e, 500);
     this.run.addGold(DROPS.CHEST_GOLD);
     this.player.heal(DROPS.CHEST_HEAL);
+    if (this.tryEvolveWeapon()) return;
     const up = this.run.randomDirectUpgrade(this.rng);
     if (up) {
       this.applyUpgrade(up);

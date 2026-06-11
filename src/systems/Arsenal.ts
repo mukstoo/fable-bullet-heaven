@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { DEPTH } from '../config';
 import { F } from '../data/frames';
-import { WEAPONS } from '../data/weapons';
+import { EVOLVED_LEVEL, weaponLevelFor } from '../data/weapons';
 import { Sfx } from './audio';
 import type { WeaponId, WeaponLevel } from '../types';
 import type { Enemy } from '../entities/Enemy';
@@ -33,7 +33,7 @@ export class Arsenal {
     const { run } = this.gs;
     for (const [id, lvl] of run.weapons) {
       if (id === 'orbitals') continue; // continuous, handled below
-      const L = WEAPONS[id].levels[lvl - 1];
+      const L = weaponLevelFor(id, lvl);
       const due = this.nextFireAt.get(id) ?? 0;
       if (runTime < due) continue;
       const fired = this.fire(id, L, runTime);
@@ -63,6 +63,7 @@ export class Arsenal {
     const base = Math.atan2(target.y - player.y, target.x - player.x);
     const amount = L.amount + run.stats.amountBonus;
     const speed = L.speed * run.stats.projSpeedMult;
+    const evolved = (run.weapons.get('spark') ?? 0) >= EVOLVED_LEVEL;
     for (let i = 0; i < amount; i++) {
       const spread = amount === 1 ? 0 : (i - (amount - 1) / 2) * 0.11;
       const a = base + spread;
@@ -77,8 +78,8 @@ export class Arsenal {
         pierce: L.pierce,
         runTime,
         texture: 'bolt',
-        tint: 0x7fd4ff,
-        scale: 1.7,
+        tint: evolved ? 0xffa050 : 0x7fd4ff,
+        scale: evolved ? 2.1 : 1.7,
         lifespanMs: 1900,
         bodyRadius: 5
       });
@@ -155,7 +156,8 @@ export class Arsenal {
   private fireNova(L: WeaponLevel, _runTime: number): boolean {
     const { player, run, juice } = this.gs;
     const radius = L.area * run.stats.areaMult;
-    juice.ringPulse(player.x, player.y, radius, 0xff8c2e, 380);
+    const evolved = (run.weapons.get('nova') ?? 0) >= EVOLVED_LEVEL;
+    juice.ringPulse(player.x, player.y, radius, evolved ? 0x8cde5a : 0xff8c2e, 380);
     Sfx.play('nova', 0.22);
     for (const e of this.gs.activeEnemies) {
       const dx = e.x - player.x;
@@ -196,7 +198,7 @@ export class Arsenal {
     const { run, player } = this.gs;
     const lvl = run.weapons.get('orbitals');
     if (!lvl) return;
-    const L = WEAPONS.orbitals.levels[lvl - 1];
+    const L = weaponLevelFor('orbitals', lvl);
     const count = L.amount + run.stats.amountBonus;
     const key = `${lvl}:${count}`;
     if (key !== this.bladeKey) this.rebuildBlades(count);
@@ -214,9 +216,10 @@ export class Arsenal {
   private rebuildBlades(count: number) {
     for (const b of this.blades) b.destroy();
     this.blades = [];
+    const evolved = (this.gs.run.weapons.get('orbitals') ?? 0) >= EVOLVED_LEVEL;
     for (let i = 0; i < count; i++) {
       const b = this.gs.orbitalGroup.create(this.gs.player.x, this.gs.player.y, 'tiles', F.DAGGER) as OrbitalBlade;
-      b.setScale(2.1).setDepth(DEPTH.PROJECTILE).setTint(0xb0e8ff);
+      b.setScale(evolved ? 2.5 : 2.1).setDepth(DEPTH.PROJECTILE).setTint(evolved ? 0xffd34e : 0xb0e8ff);
       const body = b.body as Phaser.Physics.Arcade.Body;
       body.setCircle(5, 3, 3);
       body.moves = false;
@@ -234,7 +237,7 @@ export class Arsenal {
     if (!lvl || !blade.hitGates) return;
     const gate = blade.hitGates.get(enemy) ?? 0;
     if (runTime < gate) return;
-    const L = WEAPONS.orbitals.levels[lvl - 1];
+    const L = weaponLevelFor('orbitals', lvl);
     blade.hitGates.set(enemy, runTime + L.cooldownMs * this.gs.run.stats.cooldownMult);
     if (blade.hitGates.size > 300) blade.hitGates.clear();
     this.gs.damageEnemy(
@@ -253,11 +256,12 @@ export class Arsenal {
       this.auraGlow?.setVisible(false);
       return;
     }
-    const L = WEAPONS.nova.levels[lvl - 1];
+    const L = weaponLevelFor('nova', lvl);
     const radius = L.area * this.gs.run.stats.areaMult;
     if (!this.auraGlow) {
       this.auraGlow = this.gs.add.image(0, 0, 'soft_circle').setDepth(DEPTH.SHADOW).setAlpha(0.1).setTint(0xff7a3c);
     }
+    this.auraGlow.setTint(lvl >= EVOLVED_LEVEL ? 0x8cde5a : 0xff7a3c);
     this.auraGlow.setVisible(true).setPosition(this.gs.player.x, this.gs.player.y);
     this.auraGlow.setScale((radius * 2) / 96);
   }

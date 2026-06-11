@@ -1,8 +1,10 @@
-import type { WeaponDef, WeaponId } from '../types';
+import type { WeaponDef, WeaponId, WeaponLevel } from '../types';
 
 /**
  * The six auto-firing weapons. Levels are index 0 = level 1, max level 5.
  * `area`/`speed`/`pierce` are interpreted per-weapon by the weapon system.
+ * Each weapon has an `evolution`: maxed weapon + matching passive, then open a
+ * boss chest → the weapon becomes its level-6 evolved form.
  */
 export const WEAPONS: Record<WeaponId, WeaponDef> = {
   spark: {
@@ -16,7 +18,13 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
       { damage: 16, cooldownMs: 470, amount: 2, area: 0, speed: 440, pierce: 0, knockback: 70 },
       { damage: 24, cooldownMs: 440, amount: 2, area: 0, speed: 470, pierce: 1, knockback: 80 },
       { damage: 32, cooldownMs: 400, amount: 3, area: 0, speed: 500, pierce: 1, knockback: 90 }
-    ]
+    ],
+    evolution: {
+      name: 'Soulfire Barrage',
+      desc: 'The spark becomes a storm of piercing soulfire.',
+      requires: 'power',
+      level: { damage: 44, cooldownMs: 300, amount: 5, area: 0, speed: 560, pierce: 3, knockback: 110 }
+    }
   },
   arc: {
     id: 'arc',
@@ -29,7 +37,13 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
       { damage: 30, cooldownMs: 1050, amount: 2, area: 115, speed: 0, pierce: 99, knockback: 166 },
       { damage: 42, cooldownMs: 950, amount: 2, area: 130, speed: 0, pierce: 99, knockback: 180 },
       { damage: 58, cooldownMs: 850, amount: 2, area: 150, speed: 0, pierce: 99, knockback: 200 }
-    ]
+    ],
+    evolution: {
+      name: "Death's Own Scythe",
+      desc: 'A reap so wide nothing near you survives it.',
+      requires: 'haste',
+      level: { damage: 90, cooldownMs: 650, amount: 2, area: 195, speed: 0, pierce: 99, knockback: 240 }
+    }
   },
   axes: {
     id: 'axes',
@@ -42,7 +56,13 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
       { damage: 28, cooldownMs: 1250, amount: 2, area: 0, speed: 350, pierce: 4, knockback: 130 },
       { damage: 28, cooldownMs: 1100, amount: 3, area: 0, speed: 360, pierce: 4, knockback: 140 },
       { damage: 38, cooldownMs: 1000, amount: 4, area: 0, speed: 380, pierce: 5, knockback: 150 }
-    ]
+    ],
+    evolution: {
+      name: "Gravedigger's Wrath",
+      desc: 'The sky rains heavy iron that buries everything.',
+      requires: 'vitality',
+      level: { damage: 56, cooldownMs: 800, amount: 6, area: 0, speed: 400, pierce: 8, knockback: 170 }
+    }
   },
   orbitals: {
     id: 'orbitals',
@@ -55,7 +75,13 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
       { damage: 14, cooldownMs: 420, amount: 3, area: 86, speed: 195, pierce: 99, knockback: 65 },
       { damage: 20, cooldownMs: 400, amount: 3, area: 94, speed: 210, pierce: 99, knockback: 70 },
       { damage: 26, cooldownMs: 380, amount: 5, area: 104, speed: 230, pierce: 99, knockback: 78 }
-    ]
+    ],
+    evolution: {
+      name: 'The Wailing Court',
+      desc: 'A golden court of spirits holds eternal vigil.',
+      requires: 'swiftness',
+      level: { damage: 38, cooldownMs: 330, amount: 7, area: 128, speed: 290, pierce: 99, knockback: 90 }
+    }
   },
   nova: {
     id: 'nova',
@@ -68,7 +94,13 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
       { damage: 15, cooldownMs: 820, amount: 1, area: 112, speed: 0, pierce: 99, knockback: 36 },
       { damage: 19, cooldownMs: 740, amount: 1, area: 126, speed: 0, pierce: 99, knockback: 40 },
       { damage: 25, cooldownMs: 650, amount: 1, area: 145, speed: 0, pierce: 99, knockback: 46 }
-    ]
+    ],
+    evolution: {
+      name: 'Plaguefire Halo',
+      desc: 'A near-constant ring of grave-rot fire.',
+      requires: 'shield',
+      level: { damage: 34, cooldownMs: 480, amount: 1, area: 185, speed: 0, pierce: 99, knockback: 54 }
+    }
   },
   storm: {
     id: 'storm',
@@ -81,11 +113,25 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
       { damage: 50, cooldownMs: 1900, amount: 4, area: 54, speed: 0, pierce: 99, knockback: 60 },
       { damage: 62, cooldownMs: 1750, amount: 5, area: 60, speed: 0, pierce: 99, knockback: 65 },
       { damage: 80, cooldownMs: 1600, amount: 7, area: 68, speed: 0, pierce: 99, knockback: 70 }
-    ]
+    ],
+    evolution: {
+      name: "Heaven's Judgement",
+      desc: 'The sky itself passes sentence on the horde.',
+      requires: 'echo',
+      level: { damage: 115, cooldownMs: 1350, amount: 10, area: 85, speed: 0, pierce: 99, knockback: 80 }
+    }
   }
 };
 
 export const WEAPON_MAX_LEVEL = 5;
+/** weapon level value that marks the evolved form */
+export const EVOLVED_LEVEL = 6;
+
+/** per-level tunables, transparently resolving the evolved form */
+export function weaponLevelFor(id: WeaponId, lvl: number): WeaponLevel {
+  const w = WEAPONS[id];
+  return lvl >= EVOLVED_LEVEL && w.evolution ? w.evolution.level : w.levels[Math.min(lvl, WEAPON_MAX_LEVEL) - 1];
+}
 
 /** Per-level human-readable upgrade blurbs for the cards */
 export function weaponUpgradeBlurb(id: WeaponId, toLevel: number): string {

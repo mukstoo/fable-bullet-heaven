@@ -1,5 +1,35 @@
 # Decisions log
 
+## 2026-06-11 (evening) — meta-progression + evolutions (Claude Fable 5)
+
+- **Crypt Shop = data-driven like passives.** `src/data/meta.ts` mirrors the `PASSIVES`
+  contract (`apply(stats)` once per owned level); `RunState.recompute()` stacks meta first,
+  then passives, both on top of base — one stat pipeline, no special cases.
+- **Gold banks on run end** (win or lose, you keep it — VS convention). `SaveData` gained
+  `gold` + `meta`; old saves merge clean via spread-with-defaults (fresh `meta` object each
+  load so DEFAULTS is never mutated by reference).
+- **Gold is fractional internally** (Miser's Curse multiplier runs through `RunState.addGold`),
+  floored at display/bank time. Cheaper than carry-accounting per pickup.
+- **Shop cost curve totals ~1550 gold** for everything (a dozen decent runs): per-level cost
+  arrays in the defs, no formula — easier to hand-tune single steps later.
+- **Gravewalker revive lives in `hurtPlayer`**, not `endRun`: half HP, 2s i-frames, and a
+  260px damage+knockback shockwave so you don't instantly re-die inside the swarm that
+  killed you. `revivesLeft` is snapshotted at run start (buying mid-run can't grant one).
+- **Weapon evolutions = weapon level 6.** Maxed (5) weapon + matching passive owned + open a
+  boss chest → evolution replaces the random chest upgrade (priority), announced big.
+  `weaponLevelFor(id, lvl)` resolves the level-6 stats transparently, so `Arsenal` needed no
+  new behavior code — evolutions are stat/visual upgrades of existing behaviors (per-weapon
+  tints/scale mark them; HUD shows a gold-bordered `E` icon). Level-up cards never offer
+  level 6 (`buildChoices` caps at `WEAPON_MAX_LEVEL`), so the only path is the chest.
+- **Pairings:** spark+power, arc+haste, axes+vitality, orbitals+swiftness, nova+shield,
+  storm+echo — every passive powers exactly one evolution, so any 4-weapon build can chase
+  at most its own pairs.
+- **One-time "X thirsts — slay a boss!" float** when a pair becomes eligible (`evoHinted`
+  set, reset per run) — discoverability without a tutorial.
+- Shop UI is keyboard-first (grid nav + ENTER) with full mouse support; Title's global
+  "click to fight" is kept off the shop button via Phaser's `event.stopPropagation()` in the
+  object handler (object handlers fire before the scene-level `POINTER_DOWN`).
+
 ## 2026-06-11 — initial one-shot build (Claude Fable 5)
 
 - **Stack: Phaser 3.90 + TS strict + Vite 7.** Phaser 4.1 exists but 3.x is the
@@ -33,7 +63,10 @@
 
 ## Known trade-offs (deliberate)
 
-- Single playable character; no meta-progression shop (gold is score for now) — time-boxed.
+- Single playable character — time-boxed. ~~No meta-progression shop~~ (Crypt Shop shipped
+  in the evening session; gold banks + 8 permanent upgrades).
+- Evolutions are stat/visual upgrades of existing behaviors, not new mechanics — keeps the
+  Arsenal switch untouched; revisit if a evolved form should *feel* mechanically new.
 - No mobile/touch controls — desktop keyboard game.
 - `LevelUpScene` receives a `pick` callback via scene data — simple, works; an event bus
   would be cleaner if scenes multiply.

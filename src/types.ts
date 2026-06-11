@@ -63,6 +63,16 @@ export interface WeaponDef {
   /** texture key for the upgrade-card / HUD icon */
   icon: string;
   levels: WeaponLevel[]; // length = max level
+  evolution?: WeaponEvolution;
+}
+
+/** Boss-chest evolution: requires the weapon maxed + the matching passive owned. */
+export interface WeaponEvolution {
+  name: string;
+  desc: string;
+  requires: PassiveId;
+  /** stats of the evolved form (weapon level 6) */
+  level: WeaponLevel;
 }
 
 export interface PassiveDef {

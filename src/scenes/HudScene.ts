@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { COLORS, FONT, GAME_HEIGHT, GAME_WIDTH } from '../config';
-import { WEAPONS } from '../data/weapons';
+import { EVOLVED_LEVEL, WEAPONS } from '../data/weapons';
 import { PASSIVES } from '../data/passives';
 import { Sfx } from '../systems/audio';
 import type { GameScene } from './GameScene';
@@ -125,7 +125,10 @@ export class HudScene extends Phaser.Scene {
   }
 
   private drawIcon(icon: string, x: number, y: number, level: number) {
-    const bg = this.add.rectangle(x + 12, y + 12, 28, 28, 0x14142a).setStrokeStyle(1, 0x44446a);
+    const evolved = level >= EVOLVED_LEVEL;
+    const bg = this.add
+      .rectangle(x + 12, y + 12, 28, 28, evolved ? 0x2a2210 : 0x14142a)
+      .setStrokeStyle(1, evolved ? 0xffd34e : 0x44446a);
     this.buildIcons.push(bg);
     let img: Phaser.GameObjects.Image;
     if (icon.startsWith('tile:')) {
@@ -136,10 +139,10 @@ export class HudScene extends Phaser.Scene {
       img = this.add.image(x + 12, y + 12, icon);
     }
     this.buildIcons.push(img);
-    const lvlText = this.add.text(x + 21, y + 16, String(level), {
+    const lvlText = this.add.text(x + 21, y + 16, evolved ? 'E' : String(level), {
       fontFamily: FONT,
       fontSize: '7px',
-      color: '#ffd34e',
+      color: evolved ? '#ff9a3c' : '#ffd34e',
       stroke: '#000000',
       strokeThickness: 2
     });
