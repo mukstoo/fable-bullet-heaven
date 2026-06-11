@@ -41,9 +41,10 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
   private decor: Phaser.GameObjects.Image[] = [];
   private hpBarBg!: Phaser.GameObjects.Rectangle;
   private hpBarFill!: Phaser.GameObjects.Rectangle;
-  private keys!: Record<'W' | 'A' | 'S' | 'D' | 'P' | 'M', Phaser.Input.Keyboard.Key>;
+  private keys!: Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private escKey!: Phaser.Input.Keyboard.Key;
+  /** debounce so pause-on and resume don't fight over the same keystroke */
+  private lastPauseToggle = 0;
   private pendingLevelUps = 0;
   private choosingUpgrade = false;
   private regenCarry = 0;
@@ -69,6 +70,7 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
       .tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, 'ground')
       .setOrigin(0)
       .setScrollFactor(0)
+      .setTileScale(2) // ground pixels at the same chunkiness as the 2x sprites
       .setDepth(DEPTH.GROUND);
     this.add
       .image(0, 0, 'vignette')
@@ -142,10 +144,14 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
     this.hpBarFill = this.add.rectangle(0, 0, 34, 3, COLORS.HP_BAR).setDepth(DEPTH.FX).setOrigin(0, 0.5);
 
     // --- input ---
+    // movement is polled (held keys); one-shot actions are event-driven because
+    // a fast tap can deliver keydown+keyup in one input flush, wiping JustDown
     const kb = this.input.keyboard!;
-    this.keys = kb.addKeys('W,A,S,D,P,M') as GameScene['keys'];
+    this.keys = kb.addKeys('W,A,S,D') as GameScene['keys'];
     this.cursors = kb.createCursorKeys();
-    this.escKey = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    kb.on('keydown-P', () => this.requestPause());
+    kb.on('keydown-ESC', () => this.requestPause());
+    kb.on('keydown-M', () => Sfx.toggleMute());
 
     // --- UI + music ---
     this.scene.launch('Hud');
@@ -163,19 +169,15 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
     this.runTime += delta;
     const rt = this.runTime;
 
-    // input
+    // input (— __ghMove is an automated-playtest override)
+    const auto = (window as { __ghMove?: { x: number; y: number } }).__ghMove;
     const left = this.cursors.left.isDown || this.keys.A.isDown;
     const right = this.cursors.right.isDown || this.keys.D.isDown;
     const up = this.cursors.up.isDown || this.keys.W.isDown;
     const down = this.cursors.down.isDown || this.keys.S.isDown;
-    this.player.move((right ? 1 : 0) - (left ? 1 : 0), (down ? 1 : 0) - (up ? 1 : 0), delta);
-
-    if (Phaser.Input.Keyboard.JustDown(this.keys.M)) Sfx.toggleMute();
-    if (Phaser.Input.Keyboard.JustDown(this.keys.P) || Phaser.Input.Keyboard.JustDown(this.escKey)) {
-      this.scene.launch('Pause');
-      this.scene.pause();
-      return;
-    }
+    const dirX = auto ? auto.x : (right ? 1 : 0) - (left ? 1 : 0);
+    const dirY = auto ? auto.y : (down ? 1 : 0) - (up ? 1 : 0);
+    this.player.move(dirX, dirY, delta);
 
     // regen
     if (this.run.stats.regenPerSec > 0 && this.player.hp < this.run.stats.maxHp) {
@@ -211,11 +213,20 @@ export class GameScene extends Phaser.Scene implements EnemyContext {
 
     // ground scroll + decor recycling + hp bar follow
     const cam = this.cameras.main;
-    this.ground.setTilePosition(cam.scrollX, cam.scrollY);
+    this.ground.setTilePosition(cam.scrollX / 2, cam.scrollY / 2); // matches tileScale 2
     this.recycleDecor();
     this.hpBarBg.setPosition(this.player.x, this.player.y - 26);
     const ratio = Phaser.Math.Clamp(this.player.hp / this.run.stats.maxHp, 0, 1);
     this.hpBarFill.setPosition(this.player.x - 17, this.player.y - 26).setScale(ratio, 1);
+  }
+
+  private requestPause() {
+    if (this.runEnded || this.choosingUpgrade || !this.scene.isActive()) return;
+    const now = performance.now();
+    if (now - this.lastPauseToggle < 250) return;
+    this.lastPauseToggle = now;
+    this.scene.launch('Pause');
+    this.scene.pause();
   }
 
   private cullProjectiles(group: Phaser.Physics.Arcade.Group, rt: number) {

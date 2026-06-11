@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config';
-import { F } from '../data/frames';
 import { Sfx } from '../systems/audio';
 
 const SFX_KEYS = [
@@ -176,9 +175,12 @@ export class BootScene extends Phaser.Scene {
     const ctx = ct.getContext();
     const img = this.textures.get('tiles').getSourceImage() as HTMLImageElement | HTMLCanvasElement;
     const rng = new Phaser.Math.RandomDataGenerator(['gravehorde']);
+    const plain = [0, 1, 13, 25];
+    const pebbly = [12, 24];
     for (let ty = 0; ty < 8; ty++) {
       for (let tx = 0; tx < 8; tx++) {
-        const frame = rng.weightedPick([...F.GROUND]); // plain dirt more likely (first entries)
+        // mostly featureless dirt; sparse pebble tiles so the repeat isn't loud
+        const frame = rng.frac() < 0.1 ? rng.pick(pebbly) : rng.pick(plain);
         const col = frame % 12;
         const row = Math.floor(frame / 12);
         ctx.drawImage(img, col * 16, row * 16, 16, 16, tx * 16, ty * 16, 16, 16);
@@ -186,7 +188,7 @@ export class BootScene extends Phaser.Scene {
     }
     // night mood pass
     ctx.globalCompositeOperation = 'multiply';
-    ctx.fillStyle = 'rgb(126,122,168)';
+    ctx.fillStyle = 'rgb(168,158,182)';
     ctx.fillRect(0, 0, 128, 128);
     ctx.globalCompositeOperation = 'source-over';
     ct.refresh();

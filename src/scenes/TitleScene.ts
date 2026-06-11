@@ -17,6 +17,7 @@ export class TitleScene extends Phaser.Scene {
     const ground = this.add
       .tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, 'ground')
       .setOrigin(0)
+      .setTileScale(2)
       .setAlpha(0.5);
     this.tweens.add({
       targets: ground,

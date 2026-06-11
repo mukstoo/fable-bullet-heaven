@@ -23,7 +23,7 @@ async function start() {
   await loadFont();
   document.querySelector('.boot-msg')?.remove();
 
-  new Phaser.Game({
+  const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
     width: GAME_WIDTH,
@@ -43,6 +43,9 @@ async function start() {
     },
     scene: [BootScene, TitleScene, GameScene, HudScene, LevelUpScene, PauseScene, GameOverScene]
   });
+
+  // debug/testing handle (used by automated playtests; harmless in production)
+  (window as unknown as Record<string, unknown>).__gravehorde = game;
 }
 
 void start();
