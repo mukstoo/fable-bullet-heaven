@@ -50,11 +50,11 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     desc: 'Spectral blades orbit you, shredding what they touch.',
     icon: 'tile:105',
     levels: [
-      { damage: 10, cooldownMs: 450, amount: 1, area: 74, speed: 170, pierce: 99, knockback: 90 },
-      { damage: 14, cooldownMs: 450, amount: 2, area: 80, speed: 180, pierce: 99, knockback: 95 },
-      { damage: 14, cooldownMs: 420, amount: 3, area: 86, speed: 195, pierce: 99, knockback: 100 },
-      { damage: 20, cooldownMs: 400, amount: 3, area: 94, speed: 210, pierce: 99, knockback: 110 },
-      { damage: 26, cooldownMs: 380, amount: 5, area: 104, speed: 230, pierce: 99, knockback: 120 }
+      { damage: 10, cooldownMs: 450, amount: 1, area: 74, speed: 170, pierce: 99, knockback: 55 },
+      { damage: 14, cooldownMs: 450, amount: 2, area: 80, speed: 180, pierce: 99, knockback: 60 },
+      { damage: 14, cooldownMs: 420, amount: 3, area: 86, speed: 195, pierce: 99, knockback: 65 },
+      { damage: 20, cooldownMs: 400, amount: 3, area: 94, speed: 210, pierce: 99, knockback: 70 },
+      { damage: 26, cooldownMs: 380, amount: 5, area: 104, speed: 230, pierce: 99, knockback: 78 }
     ]
   },
   nova: {
@@ -63,11 +63,11 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     desc: 'Pulses of grave-fire scorch everything around you.',
     icon: 'gen:icon_nova',
     levels: [
-      { damage: 9, cooldownMs: 950, amount: 1, area: 85, speed: 0, pierce: 99, knockback: 70 },
-      { damage: 12, cooldownMs: 900, amount: 1, area: 100, speed: 0, pierce: 99, knockback: 75 },
-      { damage: 15, cooldownMs: 820, amount: 1, area: 112, speed: 0, pierce: 99, knockback: 80 },
-      { damage: 19, cooldownMs: 740, amount: 1, area: 126, speed: 0, pierce: 99, knockback: 90 },
-      { damage: 25, cooldownMs: 650, amount: 1, area: 145, speed: 0, pierce: 99, knockback: 100 }
+      { damage: 9, cooldownMs: 950, amount: 1, area: 85, speed: 0, pierce: 99, knockback: 28 },
+      { damage: 12, cooldownMs: 900, amount: 1, area: 100, speed: 0, pierce: 99, knockback: 32 },
+      { damage: 15, cooldownMs: 820, amount: 1, area: 112, speed: 0, pierce: 99, knockback: 36 },
+      { damage: 19, cooldownMs: 740, amount: 1, area: 126, speed: 0, pierce: 99, knockback: 40 },
+      { damage: 25, cooldownMs: 650, amount: 1, area: 145, speed: 0, pierce: 99, knockback: 46 }
     ]
   },
   storm: {

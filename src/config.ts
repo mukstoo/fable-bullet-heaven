@@ -17,7 +17,7 @@ export const PLAYER = {
   BASE_MAGNET: 60,
   RADIUS: 11,
   /** ms of invulnerability after taking a hit */
-  IFRAMES_MS: 600,
+  IFRAMES_MS: 350,
   /** how often one enemy in contact can hurt you (ms) */
   CONTACT_TICK_MS: 700,
   SCALE: 2.4
@@ -27,8 +27,8 @@ export const PLAYER = {
 export const DIFFICULTY = {
   /** +35% enemy HP per minute */
   HP_GROWTH_PER_MIN: 0.35,
-  /** +6% enemy damage per minute */
-  DMG_GROWTH_PER_MIN: 0.06,
+  /** +8% enemy damage per minute */
+  DMG_GROWTH_PER_MIN: 0.08,
   /** enemies farther than this from the player are recycled to the spawn ring */
   LEASH_RADIUS: 1100,
   /** spawn ring distance from player (just off-screen) */
@@ -48,7 +48,7 @@ export const POOL_SIZES = {
 export const XP = {
   /** xp needed to go from `level` to `level+1` */
   needed(level: number): number {
-    return Math.round(6 + (level - 1) * 6 + Math.pow(level - 1, 1.55));
+    return Math.round(5 + (level - 1) * 5 + Math.pow(level - 1, 1.45));
   },
   GEM_SMALL: 1,
   GEM_MED: 5,
