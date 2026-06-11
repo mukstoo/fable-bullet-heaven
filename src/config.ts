@@ -19,7 +19,7 @@ export const PLAYER = {
   /** ms of invulnerability after taking a hit */
   IFRAMES_MS: 350,
   /** how often one enemy in contact can hurt you (ms) */
-  CONTACT_TICK_MS: 700,
+  CONTACT_TICK_MS: 550,
   SCALE: 2.4
 };
 

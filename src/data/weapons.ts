@@ -24,11 +24,11 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     desc: 'A sweeping blade arc toward the nearest enemy.',
     icon: 'tile:104',
     levels: [
-      { damage: 22, cooldownMs: 1150, amount: 1, area: 95, speed: 0, pierce: 99, knockback: 190 },
-      { damage: 30, cooldownMs: 1100, amount: 1, area: 105, speed: 0, pierce: 99, knockback: 200 },
-      { damage: 30, cooldownMs: 1050, amount: 2, area: 115, speed: 0, pierce: 99, knockback: 210 },
-      { damage: 42, cooldownMs: 950, amount: 2, area: 130, speed: 0, pierce: 99, knockback: 230 },
-      { damage: 58, cooldownMs: 850, amount: 2, area: 150, speed: 0, pierce: 99, knockback: 260 }
+      { damage: 22, cooldownMs: 1150, amount: 1, area: 95, speed: 0, pierce: 99, knockback: 150 },
+      { damage: 30, cooldownMs: 1100, amount: 1, area: 105, speed: 0, pierce: 99, knockback: 158 },
+      { damage: 30, cooldownMs: 1050, amount: 2, area: 115, speed: 0, pierce: 99, knockback: 166 },
+      { damage: 42, cooldownMs: 950, amount: 2, area: 130, speed: 0, pierce: 99, knockback: 180 },
+      { damage: 58, cooldownMs: 850, amount: 2, area: 150, speed: 0, pierce: 99, knockback: 200 }
     ]
   },
   axes: {
