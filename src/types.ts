@@ -189,6 +189,8 @@ export interface SaveData {
   wins: number;
   runs: number;
   muted: boolean;
+  /** master volume 0..1 */
+  volume: number;
   /** banked gold, spendable in the Crypt Shop */
   gold: number;
   meta: MetaLevels;

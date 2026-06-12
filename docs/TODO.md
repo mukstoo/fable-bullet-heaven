@@ -26,12 +26,14 @@
       form (all 6 weapons), eligibility hint, HUD `E` marker, evolved visuals
 - [x] Treasure goblin: Tomb Mimic at 2:30 / 7:00 / 9:30 — flees with panicky wobble,
       harmless, bursts into 12–18 coins if caught, escapes after 10s (or past the leash)
+- [x] Master volume control: persisted 0–100% in 10% steps — pause menu row
+      ([<]/[>] clickable + arrow keys) and title screen ([,]/[.] or arrows)
+- [x] Pause build list shows evolved weapon names ("Soulfire Barrage (EVOLVED)")
 
 ## Next session candidates
 
 - [ ] 2nd/3rd playable character (different starting weapon + stat spread)
 - [ ] Touch controls (virtual joystick) for mobile
-- [ ] Settings: volume sliders (currently mute toggle only)
 - [ ] Damage-type variety: DoT/burn, slow, crits
 - [ ] Shop balance pass once a human has played a few runs (cost curve is a guess:
       ~1550 gold total, earn rate ~50–120/run)

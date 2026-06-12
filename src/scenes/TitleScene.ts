@@ -142,21 +142,37 @@ export class TitleScene extends Phaser.Scene {
         .setOrigin(0.5);
     }
 
-    this.add
-      .text(GAME_WIDTH - 6, GAME_HEIGHT - 14, 'art: kenney.nl · music: cynicmusic · [M]ute', {
+    const creditsLine = this.add
+      .text(GAME_WIDTH - 6, GAME_HEIGHT - 14, '', {
         fontFamily: FONT,
         fontSize: '7px',
         color: '#55503e'
       })
       .setOrigin(1, 0);
+    const refreshCredits = () => {
+      creditsLine.setText(
+        `art: kenney.nl · music: cynicmusic · [M]ute · [</>] vol ${Math.round(Sfx.volume * 100)}%`
+      );
+    };
+    refreshCredits();
 
     Sfx.playMusic('music_title', 0.35);
+
+    const bumpVolume = (dir: number) => {
+      Sfx.adjustVolume(dir);
+      refreshCredits();
+      Sfx.play('uiclick', 0.5);
+    };
 
     const kb = this.input.keyboard!;
     kb.on('keydown-ENTER', () => this.startGame());
     kb.on('keydown-SPACE', () => this.startGame());
     kb.on('keydown-S', () => this.openShop());
     kb.on('keydown-M', () => Sfx.toggleMute());
+    kb.on('keydown-COMMA', () => bumpVolume(-1));
+    kb.on('keydown-PERIOD', () => bumpVolume(1));
+    kb.on('keydown-LEFT', () => bumpVolume(-1));
+    kb.on('keydown-RIGHT', () => bumpVolume(1));
     this.input.on('pointerdown', () => this.startGame());
   }
 

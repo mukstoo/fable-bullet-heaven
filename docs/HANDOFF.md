@@ -1,66 +1,66 @@
 # HANDOFF — GRAVEHORDE
 
-_Last update: 2026-06-11 evening session (Claude Fable 5): Crypt Shop + weapon evolutions_
+_Last update: 2026-06-11, end of evening session (Claude Fable 5)_
 
-## Next session starts here
+## Now
 
-1. **Rodrigo still owes first human playtest feedback.** Now doubly relevant: the shop
-   cost curve (~1550 gold total, ~50–120 earned/run) and evolved-weapon power are
-   bot-balanced guesses. Knobs: `src/config.ts`, `src/data/meta.ts`, `src/data/weapons.ts`.
-2. Feature shortlist (ranked): **2nd playable character** (sprites in tilemap frames
-   84–112; needs a character-select + per-character starting weapon/stat spread) →
-   volume sliders → touch controls → damage-type variety.
-3. `docs/setup-review.md` has tooling proposals for Rodrigo's global CC setup — only
-   implement what he approves.
+Nothing in progress — session closed clean. v2 (Crypt Shop + evolutions + Tomb Mimic) is
+**deployed and confirmed live** at https://mukstoo.github.io/fable-bullet-heaven/ (bundle
+content-verified via curl). The volume-control commit was pushed right at session end:
+**confirm its Pages run went green** (Actions tab — the GitHub API was timing out locally,
+so the very last deploy is pushed-but-not-curl-verified).
 
-## State: SHIPPED ✅ (v2 — meta-progression update)
+## Done (this session)
 
-- **Live**: https://mukstoo.github.io/fable-bullet-heaven/
-- **Repo**: https://github.com/mukstoo/fable-bullet-heaven (`main` = deployed, `feat/game` = working branch)
-- `npm run build` green (tsc strict + vite). Verified in real Chrome via Playwright.
+- **Crypt Shop meta-progression** — gold banks to the save on run end; 8 permanent
+  upgrades incl. once-per-run Gravewalker revive (half HP + repel shockwave).
+  Files: `src/data/meta.ts`, `src/scenes/ShopScene.ts`, `src/systems/save.ts`,
+  `src/systems/RunState.ts` (meta stacks before passives in `recompute()`),
+  entries in Title `[S]` / GameOver `[S]`.
+- **Weapon evolutions** — all 6 weapons: maxed (LV5) + paired passive + boss chest →
+  level-6 form via `weaponLevelFor()`; chest evolution outranks the random chest upgrade;
+  one-time "thirsts — slay a boss!" hint; HUD gold-border `E`. Files: `src/data/weapons.ts`
+  (`evolution` blocks), `src/systems/Arsenal.ts`, `src/scenes/GameScene.ts`.
+- **Tomb Mimic treasure event** (t=150/420/570) — `fleeing` flag on EnemyDef: harmless,
+  flees with wobble, 12–18 coin shower on kill, escapes after 10s or past the leash.
+  Files: `src/data/enemies.ts`, `src/entities/Enemy.ts`, `src/systems/SpawnDirector.ts`,
+  `src/systems/Loot.ts`, `config.MIMIC`.
+- **Master volume** — persisted 0–100% (10% steps): pause-menu row (clickable `[<]`/`[>]`
+  + arrows) and title keys (`,`/`.`/arrows). Files: `src/systems/audio.ts` (cached volume),
+  `src/scenes/PauseScene.ts`, `src/scenes/TitleScene.ts`. Pause build list now names
+  evolved weapons ("Soulfire Barrage (EVOLVED)").
+- All of it Playwright-verified in real Chrome (purchase→persist→stats→revive→bank loop;
+  evolve/no-double-evolve; mimic flee/kill/escape; volume sync + persistence).
 
-## What this is
+## Decisions (full log in docs/decisions.md)
 
-Complete dark-fantasy bullet-heaven: 12-minute runs, 6 weapons × 5 levels **+ a level-6
-evolution each**, 8 passives, 7 enemy types + elites + 3 bosses, level-up draft,
-pickups/chests, **Crypt Shop meta-progression** (banked gold → 8 permanent upgrades incl.
-a once-per-run revive), title/pause/game-over/victory/shop screens, SFX + 2 music tracks,
-localStorage save. All CC0/OFL assets credited in CREDITS.md.
+- Meta upgrades reuse the passive `apply(stats)` contract; one stat pipeline.
+- `run.gold` is fractional internally (Miser's Curse multiplier); floor on display/bank.
+- Evolutions are stat/visual upgrades (weapon level 6), not new behaviors — Arsenal untouched.
+- AudioBus caches master volume — Phaser's WebAudio gain applies sets async, reading
+  `game.sound.volume` back returns the old value.
+- Local `vite build` segfaulted 3× (OneDrive + dev-server contention), then passed —
+  environmental; stop dev server / `rm -rf dist` / retry; CI is the authoritative gate.
 
-## This session's additions (2026-06-11 evening)
+## Checks (state at close)
 
-- **Crypt Shop** (`src/scenes/ShopScene.ts` + `src/data/meta.ts`): gold now banks on run
-  end; 4×2 card grid, keyboard + mouse; buys persist immediately. Entry: Title `[S]` /
-  GameOver `[S]`. Meta stats stack in `RunState.recompute()` before passives.
-  Gravewalker's Pact = revive at half HP + repel shockwave (logic in `hurtPlayer`).
-- **Weapon evolutions** (`evolution` blocks in `src/data/weapons.ts`): maxed weapon +
-  matching passive + boss chest → weapon level 6 via `weaponLevelFor()`. Chest evolution
-  takes priority over the random chest upgrade. Pairings: spark+power, arc+haste,
-  axes+vitality, orbitals+swiftness, nova+shield, storm+echo. One-time "thirsts — slay a
-  boss!" hint when eligible; HUD marks evolved icons with gold border + `E`.
-- **Tomb Mimic treasure event** (t=150/420/570): harmless chest-creature spawns at the
-  screen edge and flees; kill it inside 10s for a 12–18 coin shower, or it slips away.
-  `fleeing` flag on EnemyDef + `config.MIMIC` knobs.
-- Both features Playwright-verified end-to-end (buy → persist → stats apply → revive →
-  death → bank → re-enter shop; evolve → no double-evolve → evolved visuals/stats).
+- `tsc --noEmit` ✅ · `vite build` ✅ (after env retries) · zero console errors in browser runs.
+- Working tree clean; `feat/game` = `main` = pushed.
 
-## How it was verified (still no human player!)
+## Next (in order)
 
-- Playwright: shop purchase loop with localStorage assertions; forced revive + death;
-  forced evolutions via `__gravehorde` handle (`gs.openChest()` after setting build).
-- Earlier sessions: autonomous kiting bot over the full 12-min curve (pattern in
-  docs/decisions.md), 57+ FPS at 188 enemies.
+1. **Rodrigo's first human playtest** — shop cost curve (~1550 gold total, ~50–120/run)
+   and evolved-weapon power are bot-balanced guesses. Knobs: `src/config.ts`, `src/data/*`.
+2. **2nd playable character** — sprites already in the tilemap (frames 84–112); needs
+   character select on Title + per-character starting weapon/stat spread.
+3. Touch controls (virtual joystick) → damage-type variety (DoT/slow/crits) → itch.io.
+4. `docs/setup-review.md` tooling proposals — only what Rodrigo approves.
 
-## Gotchas worth remembering
+## Gotchas for the next session
 
-- One-shot keys must be **event-driven** (`keydown-X`), never `JustDown` polling (fast
-  taps wipe the latch) — documented in CLAUDE.md hard rules.
-- All gameplay timing runs on `GameScene.runTime` (pausable clock), never `time`/`now()`.
-- `run.gold` is **fractional** internally (gold multiplier); floor at display/bank.
-- Title screen's global "click to fight" vs. shop button: object handlers fire first;
-  the shop button calls `event.stopPropagation()`.
-
-## Loose ends (cosmetic, non-blocking)
-
-- `tmp/` holds asset-pack downloads + labeled contact sheet (gitignored, deletable).
-- Playwright verify-*.jpeg screenshots in repo root are untracked debris — delete freely.
+- One-shot keys: event-driven `keydown-X`, never `JustDown` polling (CLAUDE.md hard rule).
+- All gameplay timing on `GameScene.runTime` — never `time`/`performance.now()`.
+- Playwright + pause: level-up modals freeze measurements; set `run.xpNeeded = 1e9` and
+  long i-frames before movement assertions.
+- Title/Pause global pointerdown vs buttons: object handlers fire first — call
+  `event.stopPropagation()` in the button handler.

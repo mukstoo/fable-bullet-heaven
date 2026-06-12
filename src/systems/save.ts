@@ -8,6 +8,7 @@ const DEFAULTS: SaveData = {
   wins: 0,
   runs: 0,
   muted: false,
+  volume: 1,
   gold: 0,
   meta: {}
 };

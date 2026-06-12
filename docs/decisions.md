@@ -38,6 +38,16 @@
   silently freeze any in-flight measurement (`setTimeout` keeps running, runTime doesn't).
   For movement assertions set `run.xpNeeded = 1e9` + long player i-frames first, and sample
   `runTime` inside the evaluate to prove the clock advanced.
+- **Master volume = one global knob** (`game.sound.volume`), persisted in the save, stepped
+  10% via pause-menu row + title keys. **Gotcha:** Phaser's WebAudio manager applies volume
+  through the gain node asynchronously — reading `game.sound.volume` right after setting it
+  returns the OLD value (display lagged one step). The AudioBus now caches the volume itself
+  and never reads it back from the sound manager.
+- **Local `vite build` can segfault on this machine** (node crash mid-transform, observed
+  3× in a row then fine) — OneDrive sync + a running dev server contending over the project
+  dir is the likely cause. It is environmental, not code: `tsc` stayed green and the same
+  build passed minutes later. If it recurs: stop the dev server, `rm -rf dist`, retry; the
+  CI build on Ubuntu is the authoritative gate either way.
 
 ## 2026-06-11 — initial one-shot build (Claude Fable 5)
 

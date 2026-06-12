@@ -20,13 +20,35 @@ class AudioBus {
   };
   private music?: Phaser.Sound.BaseSound;
 
+  /** cached master volume — the WebAudio gain node applies sets asynchronously,
+      so reading game.sound.volume right back returns the OLD value */
+  private vol = 1;
+
   init(game: Phaser.Game) {
     this.game = game;
-    game.sound.mute = loadSave().muted;
+    const save = loadSave();
+    game.sound.mute = save.muted;
+    this.vol = save.volume;
+    game.sound.volume = this.vol;
   }
 
   get muted(): boolean {
     return this.game?.sound.mute ?? false;
+  }
+
+  /** master volume 0..1 (multiplies every sfx + music volume) */
+  get volume(): number {
+    return this.vol;
+  }
+
+  /** step the master volume in 10% increments and persist it */
+  adjustVolume(deltaSteps: number) {
+    if (!this.game) return;
+    this.vol = Phaser.Math.Clamp(Math.round(this.vol * 10 + deltaSteps) / 10, 0, 1);
+    this.game.sound.volume = this.vol;
+    const save = loadSave();
+    save.volume = this.vol;
+    storeSave(save);
   }
 
   toggleMute(): boolean {

@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import { FONT, GAME_HEIGHT, GAME_WIDTH } from '../config';
-import { WEAPONS } from '../data/weapons';
+import { EVOLVED_LEVEL, WEAPONS } from '../data/weapons';
 import { PASSIVES } from '../data/passives';
 import { Sfx } from '../systems/audio';
 import type { GameScene } from './GameScene';
 
 export class PauseScene extends Phaser.Scene {
+  private volumeText!: Phaser.GameObjects.Text;
+
   constructor() {
     super('Pause');
   }
@@ -26,7 +28,10 @@ export class PauseScene extends Phaser.Scene {
     // current build summary
     const gs = this.scene.get('Game') as GameScene;
     const lines: string[] = ['— YOUR BUILD —', ''];
-    for (const [id, lvl] of gs.run.weapons) lines.push(`${WEAPONS[id].name}  LV${lvl}`);
+    for (const [id, lvl] of gs.run.weapons) {
+      const evo = WEAPONS[id].evolution;
+      lines.push(lvl >= EVOLVED_LEVEL && evo ? `${evo.name}  (EVOLVED)` : `${WEAPONS[id].name}  LV${lvl}`);
+    }
     if (gs.run.passives.size > 0) lines.push('');
     for (const [id, lvl] of gs.run.passives) lines.push(`${PASSIVES[id].name}  LV${lvl}`);
     this.add
@@ -39,12 +44,29 @@ export class PauseScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0);
 
-    this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT - 92, '[P/ESC] resume   [R] restart   [Q] quit to title   [M] mute', {
+    // volume row: [<] VOLUME 100% [>]
+    this.volumeText = this.add
+      .text(GAME_WIDTH / 2, GAME_HEIGHT - 120, '', {
         fontFamily: FONT,
         fontSize: '10px',
-        color: '#9a937c'
+        color: '#9be8ff'
       })
+      .setOrigin(0.5);
+    this.refreshVolume();
+    this.volumeArrow(GAME_WIDTH / 2 - 110, -1);
+    this.volumeArrow(GAME_WIDTH / 2 + 110, 1);
+
+    this.add
+      .text(
+        GAME_WIDTH / 2,
+        GAME_HEIGHT - 92,
+        '[P/ESC] resume   [R] restart   [Q] quit to title   [M] mute   [</>] volume',
+        {
+          fontFamily: FONT,
+          fontSize: '10px',
+          color: '#9a937c'
+        }
+      )
       .setOrigin(0.5);
 
     const kb = this.input.keyboard!;
@@ -53,7 +75,41 @@ export class PauseScene extends Phaser.Scene {
     kb.on('keydown-R', () => this.restart());
     kb.on('keydown-Q', () => this.quitToTitle());
     kb.on('keydown-M', () => Sfx.toggleMute());
+    kb.on('keydown-LEFT', () => this.bumpVolume(-1));
+    kb.on('keydown-RIGHT', () => this.bumpVolume(1));
+    kb.on('keydown-COMMA', () => this.bumpVolume(-1));
+    kb.on('keydown-PERIOD', () => this.bumpVolume(1));
     this.input.on('pointerdown', () => this.resumeGame());
+  }
+
+  private bumpVolume(dir: number) {
+    Sfx.adjustVolume(dir);
+    this.refreshVolume();
+    Sfx.play('uiclick', 0.5);
+  }
+
+  private refreshVolume() {
+    this.volumeText.setText(`VOLUME ${Math.round(Sfx.volume * 100)}%`);
+  }
+
+  private volumeArrow(x: number, dir: number) {
+    const t = this.add
+      .text(x, GAME_HEIGHT - 120, dir < 0 ? '[<]' : '[>]', {
+        fontFamily: FONT,
+        fontSize: '11px',
+        color: '#9be8ff'
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    t.on('pointerover', () => t.setColor('#ffffff'));
+    t.on('pointerout', () => t.setColor('#9be8ff'));
+    t.on(
+      'pointerdown',
+      (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
+        event.stopPropagation(); // the backdrop click would resume the game
+        this.bumpVolume(dir);
+      }
+    );
   }
 
   private resumeGame() {
